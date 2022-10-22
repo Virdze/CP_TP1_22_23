@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "../headers/k_means.h"
-#include "../bin/utils.h"
+#include "../headers/utils.h"
 
 
 #define N 10000000 //Numero de amostras
@@ -37,13 +37,15 @@ void init(){
 }
 
 float euclidean_distance(Tuple p1, Tuple p2){
-    return sqrt(pow(p2.x - p1.y, 2) + pow(p2.y - p1.y,2))
+    //return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y,2));            ver qual a mais eficiente
+    return sqrt((p2.y-p1.y) * (p2.y-p1.y) + (p2.x-p1.x) * (p2.x-p1.x));
+
 }
 
 int calculate_cluster(float min, int point_index){
     int cluster = 0;
     for(int i = 1; i < K; i++){
-        float dist = euclidean_distance(clusters[i].centroid, pontos[point_index];
+        float dist = euclidean_distance(clusters[i].centroid, pontos[point_index]);
         if (min < dist){
             min = dist;
             cluster = i; 
@@ -58,7 +60,7 @@ void assign_points(){
         float min_dist = euclidean_distance(clusters[0].centroid, pontos[i]); //Calcula distancia euclediana do Ponto ao primeiro cluster
         int cluster_number = calculate_cluster(min_dist,i); // Devolve numero do cluster com o centroid mais próximo.
 
-        addPoint(clusters[cluster_number], pontos[i]);        
+        add_point_to_cluster(clusters[cluster_number], pontos[i]);        
     }
 }
 
@@ -81,6 +83,14 @@ void calculate_centroids(){
     }
 }
 
+void output(int iteracoes){
+    printf("N = %d, K = %d\n", N, K);
+    for(int i=0; i < K; i++){
+        printf("Center: (%.3f,%.3f) : Size: %d\n", clusters[i].centroid.x, clusters[i].centroid.y, clusters[i].nr_pontos);
+    }
+    printf("Iterations: %d\n", iteracoes);
+}
+
 void k_means(){
     int iterations = 0; //Vai guardar o número de iterações realizadas. OBJETIVO: 39
     Cluster * old_clusters = malloc(sizeof(struct cluster) * K);
@@ -91,18 +101,18 @@ void k_means(){
         old_clusters = clusters; //Assign current clusters to old clusters.
         
         assign_points(); //Assing each point to each cluster
-        calculate_centroid();
+        calculate_centroids();
 
 
         //Add to iterations
         iterations++;   
     }
-
+    output(iterations);
 }
 
 void main(){
     init();
-    //k_means();
+    k_means();
     printf("Ok");
     for(int i = 0; i<K; i++)
         printf("(%f,%f)\n", clusters[i].centroid.x, clusters[i].centroid.y);

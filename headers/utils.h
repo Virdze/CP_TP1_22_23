@@ -12,6 +12,6 @@ typedef struct cluster{
     Tuple centroid; 
 } Cluster;
 
-void addPoint(Cluster c, Tuple point);
+void add_point_to_cluster(Cluster c, Tuple point);
 
 #endif
