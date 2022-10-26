@@ -4,14 +4,18 @@ SRC = src/
 INCLUDES = include/
 EXEC = k_means
 
-CFLAGS = -O2 
+CFLAGS = -lm -O2
 
 .DEFAULT_GOAL = k_means
 
-k_means: $(SRC)k_means.c 
-	$(CC) $(CFLAGS) $(SRC)k_means.c -o $(BIN)$(EXEC)
+k_means: $(BIN)utils.o $(BIN)k_means.o 
+	$(CC) $(BIN)k_means.o $(BIN)utils.o -o $(BIN)$(EXEC) $(CFLAGS)
 
-$(SRC)k_means.c:  
+$(BIN)utils.o: $(SRC)utils.c 
+	$(CC) -c $(SRC)utils.c -o $(BIN)utils.o $(CFLAGS)
+
+$(BIN)k_means.o: $(SRC)k_means.c $(INCLUDES)utils.h
+	$(CC) -c $(SRC)k_means.c -o $(BIN)k_means.o $(CFLAGS)
 
 clean:
 	rm -r bin/*
