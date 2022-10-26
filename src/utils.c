@@ -1,12 +1,17 @@
-#include "../include/utils.h"
-#include <stdlib.h>
+#include "../headers/utils.h"
 #include <stdio.h>
-#include <math.h>
+#include <stdlib.h>
 
-float euclidean_distance(Tuple p1, Tuple p2){
-    float result = sqrtf(powf(p2->x - p1->y, 2) + powf(p2->y - p1->y,2));
-    return result;
+
+void add_point_to_cluster(Cluster c, Tuple point){
+    
+    if(!c.pontos){
+        c.pontos = (Tuple *) malloc(sizeof(struct tuple));
+        c.pontos[0] = point;
+        c.nr_pontos++;
+    }
+    else{
+        c.pontos[c.nr_pontos] = point;
+        c.nr_pontos++;
+    }
 }
-
-
-
