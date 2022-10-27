@@ -4,7 +4,7 @@
 #include <math.h>
 
 float euclidean_distance(Tuple p1, Tuple p2){
-    return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y,2));
+    return sqrt((p2.y - p1.y)*(p2.y - p1.y) + (p2.x - p1.x) * (p2.x - p1.x));
 }
 
 

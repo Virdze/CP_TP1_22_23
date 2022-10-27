@@ -145,8 +145,9 @@ void k_means(){
 int main(){
     init();
     k_means();
+    printf("N = %d, K = %d\n", N, K);
     for(int i = 0; i<K; i++)
-        printf("(%f,%f) %d\n", clusters[i].centroid.x, clusters[i].centroid.y, clusters[i].nr_pontos);
-    printf("Number of iterations: %d\n", iterations);
+        printf("Center: (%.3f, %.3f) : Size: %d\n", clusters[i].centroid.x, clusters[i].centroid.y, clusters[i].nr_pontos);
+    printf("Iterations: %d\n", iterations);
     return 0;
 }
