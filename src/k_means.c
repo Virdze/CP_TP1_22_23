@@ -112,7 +112,7 @@ int centroids_changed(Cluster * old_clusters, Cluster * new_clusters){
         if(verify_centroids(old_clusters[i].centroid, new_clusters[i].centroid) == 1)
             counter++;
     }
-    printf("ok\n");
+    //printf("ok\n");
     if(counter == 4)
         return 1;
     else
@@ -140,14 +140,16 @@ void k_means(){
         //Contador de iterações
         iterations++;
     }
+    printf("N = %d, K = %d\n", N, K);
+    for(int i = 0; i<K; i++)
+        printf("Center: (%.3f, %.3f) : Size: %d\n", clusters[i].centroid.x, clusters[i].centroid.y, clusters[i].nr_pontos);
+    printf("Iterations: %d\n", iterations);
+    free(pontos);
+    free(clusters);
 }
 
 int main(){
     init();
     k_means();
-    printf("N = %d, K = %d\n", N, K);
-    for(int i = 0; i<K; i++)
-        printf("Center: (%.3f, %.3f) : Size: %d\n", clusters[i].centroid.x, clusters[i].centroid.y, clusters[i].nr_pontos);
-    printf("Iterations: %d\n", iterations);
     return 0;
 }
