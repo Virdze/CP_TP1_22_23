@@ -2,20 +2,20 @@ CC = gcc
 BIN = bin/
 SRC = src/
 INCLUDES = include/
-EXEC = k_means
+EXEC = k_meansv2
 
-CFLAGS = -lm -Wall -O2
+CFLAGS = -lm -Wall -O2 -g 
 
-.DEFAULT_GOAL = k_means
+.DEFAULT_GOAL = k_meansv2
 
-k_means: $(BIN)utils.o $(BIN)k_means.o 
-	$(CC) $(BIN)k_means.o $(BIN)utils.o -o $(BIN)$(EXEC) $(CFLAGS)
+k_meansv2: $(BIN)utilsv2.o $(BIN)k_meansv2.o 
+	$(CC) $(BIN)k_meansv2.o $(BIN)utilsv2.o -o $(BIN)$(EXEC) $(CFLAGS)
 
-$(BIN)utils.o: $(SRC)utils.c 
-	$(CC) -c $(SRC)utils.c -o $(BIN)utils.o $(CFLAGS)
+$(BIN)utilsv2.o: $(SRC)utilsv2.c 
+	$(CC) -c $(SRC)utilsv2.c -o $(BIN)utilsv2.o $(CFLAGS)
 
-$(BIN)k_means.o: $(SRC)k_means.c $(INCLUDES)utils.h
-	$(CC) -c $(SRC)k_means.c -o $(BIN)k_means.o $(CFLAGS)
+$(BIN)k_meansv2.o: $(SRC)k_meansv2.c $(INCLUDES)utilsv2.h
+	$(CC) -c $(SRC)k_meansv2.c -o $(BIN)k_meansv2.o $(CFLAGS)
 
 clean:
 	rm -r bin/*
