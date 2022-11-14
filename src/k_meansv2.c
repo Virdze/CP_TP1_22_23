@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include "../include/utilsv2.h"
 
@@ -12,6 +13,7 @@ Tuple * pontos; // Vetor com os pontos
 Cluster * clusters; // Vetor com os clusters
 int iterations;
 
+extern inline float euclidean_distance(Tuple p1, Tuple p2);
 
 void init(){
 
@@ -33,10 +35,12 @@ void init(){
         clusters[i].centroid.x = pontos[i].x;
         clusters[i].centroid.y = pontos[i].y;
         clusters[i].nr_pontos = 0;
+        clusters[i].soma_x = 0;
+        clusters[i].soma_y = 0;
     }
 
 }
-
+/*
 void add_point_to_cluster(int cluster_number, int index){
     pontos[index].cluster = cluster_number;
     clusters[cluster_number].nr_pontos++;
@@ -47,48 +51,74 @@ void change_point_from_cluster(int cluster_ant,int cluster_now, int index){
     clusters[cluster_ant].nr_pontos--;
     clusters[cluster_now].nr_pontos++;
 }
-
+*/
 //Adiciona pontos ao cluster correto
 void assign_points(){
     for(int i = 0; i < N; i++){
         float min_dist = euclidean_distance(pontos[i], clusters[0].centroid); //Calcula distancia euclediana do Ponto ao primeiro cluster
-            int cluster = 0;
-            for(int j = 1; j < K; j++){
+        int cluster = 0;
+        for(int j = 1; j < K; j++){
 
-                float dist = euclidean_distance(pontos[i], clusters[j].centroid);
-                if (min_dist > dist){
-                    min_dist = dist;
-                    cluster = j;
-                }
+            float dist = euclidean_distance(pontos[i], clusters[j].centroid);
+            if (min_dist > dist){
+                min_dist = dist;
+                cluster = j;
             }
-                if(pontos[i].cluster != cluster && pontos[i].cluster != -1){
-                    change_point_from_cluster(pontos[i].cluster,cluster,i);
-                }else if(pontos[i].cluster != cluster && pontos[i].cluster == -1){
-                    add_point_to_cluster(cluster,i);
-                }
+        }
+        if(pontos[i].cluster != cluster && pontos[i].cluster != -1){
+            //Retira o ponto do cluster e retira o seu valor a soma dos pontos do cluster
+            clusters[pontos[i].cluster].nr_pontos--;
+            clusters[pontos[i].cluster].soma_x -= pontos[i].x;
+            clusters[pontos[i].cluster].soma_y -= pontos[i].y;
+            //Adiciona o ponto ao novo cluster, e adiciona o seu valor a soma dos pontos do cluster
+            pontos[i].cluster = cluster;
+            clusters[cluster].nr_pontos++;
+            clusters[cluster].soma_x += pontos[i].x;
+            clusters[cluster].soma_y += pontos[i].y;
+        }
+        else if(pontos[i].cluster != cluster && pontos[i].cluster == -1){
+            pontos[i].cluster = cluster;
+            clusters[cluster].nr_pontos++;
+            clusters[cluster].soma_x += pontos[i].x;
+            clusters[cluster].soma_y += pontos[i].y;
+        }
+    }
+}
+/*
+void funfa1(int index){
+    float min_dist = euclidean_distance(pontos[index], clusters[0].centroid); //Calcula distancia euclediana do Ponto ao primeiro cluster
+    int cluster = 0;
+    for(int j = 1; j < K; j++){
+        float dist = euclidean_distance(pontos[index], clusters[j].centroid);
+        if (min_dist > dist){
+            min_dist = dist;
+            cluster = j;
+        }
+    }
+    if(pontos[index].cluster != cluster && pontos[index].cluster != -1){
+        change_point_from_cluster(pontos[index].cluster,cluster,index);
+    }else if(pontos[index].cluster != cluster && pontos[index].cluster == -1){
+        add_point_to_cluster(cluster,index);
+    }
+}
 
+void assign_points(){
+    for(int i = 0; i < N; i+=2){
+        funfa1(i);
+        funfa1(i+1);
     }
 }
 
 void update_cluster_centroid(int cluster_number){
-
-    float acc_x = 0, // Acumulador para todas os x dos pontos associados ao cluster
-        acc_y = 0; // Acumulador para todas os y dos pontos associados ao cluster
-
-
-    for(int i = 0; i < N ; i++){
-        if(pontos[i].cluster == cluster_number){
-            acc_x += pontos[i].x;
-            acc_y += pontos[i].y;
-        }
-    }
-    clusters[cluster_number].centroid.x = acc_x/clusters[cluster_number].nr_pontos;
-    clusters[cluster_number].centroid.y = acc_y/clusters[cluster_number].nr_pontos;
+    clusters[cluster_number].centroid.x = clusters[cluster_number].soma_x/clusters[cluster_number].nr_pontos;
+    clusters[cluster_number].centroid.y = clusters[cluster_number].soma_y/clusters[cluster_number].nr_pontos;
 }
+*/
 
 void calculate_centroids(){
     for(int i = 0; i < K; i++){
-        update_cluster_centroid(i); // Calcula e atualiza centroid de cada cluster
+        clusters[i].centroid.x = clusters[i].soma_x/clusters[i].nr_pontos;
+        clusters[i].centroid.y = clusters[i].soma_y/clusters[i].nr_pontos;
     }
 }
 
@@ -100,10 +130,10 @@ int verify_centroids(Tuple t1, Tuple t2){
 int centroids_changed(Tuple * old_centroids){
     int counter = 0;
     for(int i = 0; i < K; i++){
-        if(verify_centroids(old_centroids[i], clusters[i].centroid) == 1)
-        counter++;
+        if(old_centroids[i].x == clusters[i].centroid.x && old_centroids[i].y == clusters[i].centroid.y)
+            counter++;
     }
-    if(counter == 4)
+    if(counter == K)
         return 1;
     else
         return 0;
@@ -138,8 +168,11 @@ void k_means(){
 }
 
 int main(){
+    int initial_time = clock();
     init();
     k_means();
+    int final_time = clock();
+    printf("%f\n",(final_time-initial_time)/ pow(10,6));
     return 0;
 }
 
