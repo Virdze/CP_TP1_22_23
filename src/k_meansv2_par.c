@@ -2,16 +2,18 @@
 #include <stdlib.h>
 #include <math.h>
 #include <time.h>
+#include <omp.h>
 
 #include "../include/utilsv2.h"
 
 
-#define N 10000000 //Numero de amostras
-#define K 4 //Number of clusters
 
 Tuple * pontos; // Vetor com os pontos
 Cluster * clusters; // Vetor com os clusters
 int iterations;
+int N; //Number of points
+int K; //Number of clusters
+int T; //Number of threads
 
 extern inline float euclidean_distance(Tuple p1, Tuple p2);
 
@@ -40,8 +42,30 @@ void init(){
     }
 
 }
+
+/*
+    VARIAVEIS COMUNS AS THREADS:
+        -> clusters[cluster].soma_x * 4
+        -> clusters[cluster].soma_y * 4
+        -> clusters[clusters].nr_pontos; * 4
+*/
+
+
 //Adiciona pontos ao cluster correto
 void assign_points(){
+    
+    int sums_x[K], sums_y[K], counts[K];
+    for (int k = 0 ; k < K ; k++){
+        sums_x[k] = 0;
+        sums_y[k] = 0;
+        counts[k]= 0;
+    }
+    int i,j;
+    
+    #pragma omp parallel num_threads(2)
+    #pragma omp for \
+        reduction(+ : sums_x[:(K)], sums_y[:(K)], counts[:(K)]) \
+        private(i,j) 
     for(int i = 0; i < N; i++){
         float min_dist = euclidean_distance(pontos[i], clusters[0].centroid); //Calcula distancia euclediana do Ponto ao primeiro cluster
         int cluster = 0;
@@ -53,29 +77,34 @@ void assign_points(){
                 cluster = j;
             }
         }
-
-
+        
         if(pontos[i].cluster == cluster){
-            clusters[cluster].soma_x += pontos[i].x;
-            clusters[cluster].soma_y += pontos[i].y;
+            sums_x[cluster] += pontos[i].x;
+            sums_y[cluster] += pontos[i].y;
+            counts[cluster]++;
         }else if(pontos[i].cluster != cluster){
             if(pontos[i].cluster != -1){
-                //Retira o ponto do cluster 
-                clusters[pontos[i].cluster].nr_pontos--;
                 //Adiciona o ponto ao novo cluster, e adiciona o seu valor a soma dos pontos do cluster
                 pontos[i].cluster = cluster;
-                clusters[cluster].nr_pontos++;
-                clusters[cluster].soma_x += pontos[i].x;
-                clusters[cluster].soma_y += pontos[i].y;
+                counts[cluster]++;
+                sums_x[cluster] += pontos[i].x;
+                sums_y[cluster] += pontos[i].y;
             }
+            //CHECAR SE DA PARA TIRAR OU NAO
             else if(pontos[i].cluster == -1){
                 pontos[i].cluster = cluster;
-                clusters[cluster].nr_pontos++;
-                clusters[cluster].soma_x += pontos[i].x;
-                clusters[cluster].soma_y += pontos[i].y;
+                counts[cluster]++;
+                sums_x[cluster] += pontos[i].x;
+                sums_y[cluster] += pontos[i].y;
             }
         }
     }
+    for(int tmp = 0; tmp < K ; tmp++){
+        clusters[tmp].soma_x = sums_x[tmp];
+        clusters[tmp].soma_y = sums_y[tmp];
+        clusters[tmp].nr_pontos = counts[tmp];
+    }
+
 }
 
 void calculate_centroids(){
@@ -112,11 +141,12 @@ void k_means(){
                             // Repetição desta filosofia dentro do ciclo mas com a verificação do caso de paragem
                             // Goal : 39 ITERATIONS
     int flag = 0;
-    while(!flag){
+    while(!flag && iterations < 1){
         for(int i = 0; i < K ; i++){
         old_centroids[i] = clusters[i].centroid;
         clusters[i].soma_x = 0;
         clusters[i].soma_y = 0;
+        clusters[i].nr_pontos = 0;
         }
         assign_points(); // Atribuir cada ponto ao respetivo cluster
         calculate_centroids(); //Calcular centroids de cada cluster
@@ -132,12 +162,12 @@ void k_means(){
     free(clusters);
 }
 
-int main(){
-    int initial_time = clock();
+int main(int argc, char * argv[]){
+    N = atoi(argv[1]);
+    K = atoi(argv[2]);
+    T = atoi(argv[3]);
     init();
     k_means();
-    int final_time = clock();
-    printf("%f\n",(final_time-initial_time)/ pow(10,6));
     return 0;
 }
 
