@@ -40,18 +40,6 @@ void init(){
     }
 
 }
-/*
-void add_point_to_cluster(int cluster_number, int index){
-    pontos[index].cluster = cluster_number;
-    clusters[cluster_number].nr_pontos++;
-}
-
-void change_point_from_cluster(int cluster_ant,int cluster_now, int index){
-    pontos[index].cluster = cluster_now;
-    clusters[cluster_ant].nr_pontos--;
-    clusters[cluster_now].nr_pontos++;
-}
-*/
 //Adiciona pontos ao cluster correto
 void assign_points(){
     for(int i = 0; i < N; i++){
@@ -65,55 +53,31 @@ void assign_points(){
                 cluster = j;
             }
         }
-        if(pontos[i].cluster != cluster && pontos[i].cluster != -1){
-            //Retira o ponto do cluster e retira o seu valor a soma dos pontos do cluster
-            clusters[pontos[i].cluster].nr_pontos--;
-            clusters[pontos[i].cluster].soma_x -= pontos[i].x;
-            clusters[pontos[i].cluster].soma_y -= pontos[i].y;
-            //Adiciona o ponto ao novo cluster, e adiciona o seu valor a soma dos pontos do cluster
-            pontos[i].cluster = cluster;
-            clusters[cluster].nr_pontos++;
+
+
+        if(pontos[i].cluster == cluster){
             clusters[cluster].soma_x += pontos[i].x;
             clusters[cluster].soma_y += pontos[i].y;
-        }
-        else if(pontos[i].cluster != cluster && pontos[i].cluster == -1){
-            pontos[i].cluster = cluster;
-            clusters[cluster].nr_pontos++;
-            clusters[cluster].soma_x += pontos[i].x;
-            clusters[cluster].soma_y += pontos[i].y;
-        }
-    }
-}
-/*
-void funfa1(int index){
-    float min_dist = euclidean_distance(pontos[index], clusters[0].centroid); //Calcula distancia euclediana do Ponto ao primeiro cluster
-    int cluster = 0;
-    for(int j = 1; j < K; j++){
-        float dist = euclidean_distance(pontos[index], clusters[j].centroid);
-        if (min_dist > dist){
-            min_dist = dist;
-            cluster = j;
-        }
-    }
-    if(pontos[index].cluster != cluster && pontos[index].cluster != -1){
-        change_point_from_cluster(pontos[index].cluster,cluster,index);
-    }else if(pontos[index].cluster != cluster && pontos[index].cluster == -1){
-        add_point_to_cluster(cluster,index);
-    }
-}
+        }else if(pontos[i].cluster != cluster){
 
-void assign_points(){
-    for(int i = 0; i < N; i+=2){
-        funfa1(i);
-        funfa1(i+1);
+            if(pontos[i].cluster != -1){
+                //Retira o ponto do cluster 
+                clusters[pontos[i].cluster].nr_pontos--;
+                //Adiciona o ponto ao novo cluster, e adiciona o seu valor a soma dos pontos do cluster
+                pontos[i].cluster = cluster;
+                clusters[cluster].nr_pontos++;
+                clusters[cluster].soma_x += pontos[i].x;
+                clusters[cluster].soma_y += pontos[i].y;
+            }
+            else if(pontos[i].cluster == -1){
+                pontos[i].cluster = cluster;
+                clusters[cluster].nr_pontos++;
+                clusters[cluster].soma_x += pontos[i].x;
+                clusters[cluster].soma_y += pontos[i].y;
+            }
+        }
     }
 }
-
-void update_cluster_centroid(int cluster_number){
-    clusters[cluster_number].centroid.x = clusters[cluster_number].soma_x/clusters[cluster_number].nr_pontos;
-    clusters[cluster_number].centroid.y = clusters[cluster_number].soma_y/clusters[cluster_number].nr_pontos;
-}
-*/
 
 void calculate_centroids(){
     for(int i = 0; i < K; i++){
@@ -152,6 +116,8 @@ void k_means(){
     while(!flag){
         for(int i = 0; i < K ; i++){
         old_centroids[i] = clusters[i].centroid;
+        clusters[i].soma_x = 0;
+        clusters[i].soma_y = 0;
         }
         assign_points(); // Atribuir cada ponto ao respetivo cluster
         calculate_centroids(); //Calcular centroids de cada cluster
