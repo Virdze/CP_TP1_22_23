@@ -125,11 +125,8 @@ void k_means(){
 }
 
 int main(){
-    int initial_time = clock();
     init();
     k_means();
-    int final_time = clock();
-    printf("%f\n",(final_time-initial_time)/ pow(10,6));
     return 0;
 }
 
