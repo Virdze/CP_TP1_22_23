@@ -15,9 +15,6 @@ typedef struct cluster{
     float soma_y; 
 } Cluster;
 
-
-inline float euclidean_distance(Tuple p1, Tuple p2){
-    return (p2.y - p1.y)*(p2.y - p1.y) + (p2.x - p1.x) * (p2.x - p1.x);
-}
+int verify_centroids(Tuple t1, Tuple t2);
 
 #endif

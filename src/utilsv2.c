@@ -3,10 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 
-inline float euclidean_distance(Tuple p1, Tuple p2){
-    return sqrt((p2.y - p1.y)*(p2.y - p1.y) + (p2.x - p1.x) * (p2.x - p1.x));
+
+int verify_centroids(Tuple t1, Tuple t2){
+    return (t1.x == t2.x && t1.y == t2.y);
 }
-
-
-
-

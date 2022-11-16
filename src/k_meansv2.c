@@ -13,7 +13,9 @@ Tuple * pontos; // Vetor com os pontos
 Cluster * clusters; // Vetor com os clusters
 int iterations;
 
-extern inline float euclidean_distance(Tuple p1, Tuple p2);
+static inline float euclidean_distance(Tuple p1, Tuple p2){
+    return ((p2.y - p1.y)*(p2.y - p1.y) + (p2.x - p1.x) * (p2.x - p1.x));
+}
 
 void init(){
 
@@ -77,9 +79,7 @@ void calculate_centroids(){
 }
 
 
-int verify_centroids(Tuple t1, Tuple t2){
-    return (t1.x == t2.x && t1.y == t2.y);
-}
+
 
 int centroids_changed(Tuple * old_centroids){
     int counter = 0;
