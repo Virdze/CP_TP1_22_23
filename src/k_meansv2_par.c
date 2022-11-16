@@ -54,50 +54,38 @@ void init(){
 //Adiciona pontos ao cluster correto
 void assign_points(){
     
-    int sums_x[K], sums_y[K], counts[K];
+    float sums_x[K], sums_y[K];
+    int counts[K];
     for (int k = 0 ; k < K ; k++){
         sums_x[k] = 0;
         sums_y[k] = 0;
-        counts[k]= 0;
+        counts[k] = 0;
     }
-    int i,j;
-    
-    #pragma omp parallel num_threads(2)
-    #pragma omp for \
-        reduction(+ : sums_x[:(K)], sums_y[:(K)], counts[:(K)]) \
-        private(i,j) 
-    for(int i = 0; i < N; i++){
+    int i; 
+    #pragma omp parallel for num_threads(2) \
+        reduction(+ : sums_x[:K], sums_y[:K], counts[:K]) 
+    for(i = 0; i < N; i++){
         float min_dist = euclidean_distance(pontos[i], clusters[0].centroid); //Calcula distancia euclediana do Ponto ao primeiro cluster
         int cluster = 0;
         for(int j = 1; j < K; j++){
-
             float dist = euclidean_distance(pontos[i], clusters[j].centroid);
             if (min_dist > dist){
                 min_dist = dist;
                 cluster = j;
             }
         }
-        
         if(pontos[i].cluster == cluster){
             sums_x[cluster] += pontos[i].x;
             sums_y[cluster] += pontos[i].y;
             counts[cluster]++;
         }else if(pontos[i].cluster != cluster){
-            if(pontos[i].cluster != -1){
                 //Adiciona o ponto ao novo cluster, e adiciona o seu valor a soma dos pontos do cluster
                 pontos[i].cluster = cluster;
                 counts[cluster]++;
                 sums_x[cluster] += pontos[i].x;
                 sums_y[cluster] += pontos[i].y;
-            }
-            //CHECAR SE DA PARA TIRAR OU NAO
-            else if(pontos[i].cluster == -1){
-                pontos[i].cluster = cluster;
-                counts[cluster]++;
-                sums_x[cluster] += pontos[i].x;
-                sums_y[cluster] += pontos[i].y;
-            }
         }
+
     }
     for(int tmp = 0; tmp < K ; tmp++){
         clusters[tmp].soma_x = sums_x[tmp];

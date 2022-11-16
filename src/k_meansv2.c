@@ -58,22 +58,13 @@ void assign_points(){
         if(pontos[i].cluster == cluster){
             clusters[cluster].soma_x += pontos[i].x;
             clusters[cluster].soma_y += pontos[i].y;
+            clusters[cluster].nr_pontos++;
         }else if(pontos[i].cluster != cluster){
-            if(pontos[i].cluster != -1){
-                //Retira o ponto do cluster 
-                clusters[pontos[i].cluster].nr_pontos--;
-                //Adiciona o ponto ao novo cluster, e adiciona o seu valor a soma dos pontos do cluster
-                pontos[i].cluster = cluster;
-                clusters[cluster].nr_pontos++;
-                clusters[cluster].soma_x += pontos[i].x;
-                clusters[cluster].soma_y += pontos[i].y;
-            }
-            else if(pontos[i].cluster == -1){
-                pontos[i].cluster = cluster;
-                clusters[cluster].nr_pontos++;
-                clusters[cluster].soma_x += pontos[i].x;
-                clusters[cluster].soma_y += pontos[i].y;
-            }
+            //Adiciona o ponto ao novo cluster, e adiciona o seu valor a soma dos pontos do cluster
+            pontos[i].cluster = cluster;
+            clusters[cluster].nr_pontos++;
+            clusters[cluster].soma_x += pontos[i].x;
+            clusters[cluster].soma_y += pontos[i].y;
         }
     }
 }
@@ -117,6 +108,7 @@ void k_means(){
         old_centroids[i] = clusters[i].centroid;
         clusters[i].soma_x = 0;
         clusters[i].soma_y = 0;
+        clusters[i].nr_pontos = 0;
         }
         assign_points(); // Atribuir cada ponto ao respetivo cluster
         calculate_centroids(); //Calcular centroids de cada cluster
