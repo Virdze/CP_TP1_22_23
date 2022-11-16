@@ -6,12 +6,13 @@
 #include "../include/utilsv2.h"
 
 
-#define N 10000000 //Numero de amostras
-#define K 4 //Number of clusters
 
-Tuple * pontos; // Vetor com os pontos
-Cluster * clusters; // Vetor com os clusters
+
+Tuple * pontos; // Vector with the points
+Cluster * clusters; // Vector with the clusters
 int iterations;
+int N; //Number of points
+int K; //Number of clusters
 
 static inline float euclidean_distance(Tuple p1, Tuple p2){
     return ((p2.y - p1.y)*(p2.y - p1.y) + (p2.x - p1.x) * (p2.x - p1.x));
@@ -19,7 +20,7 @@ static inline float euclidean_distance(Tuple p1, Tuple p2){
 
 void init(){
 
-    //Inicialização do vetor de pontos
+    //Initialization of points
     pontos = malloc(sizeof(struct tuple) * N);
 
     srand(10);
@@ -29,8 +30,7 @@ void init(){
         pontos[i].cluster = -1;
     }
 
-
-    //Inicialização dos clusters
+    //Initialization of clusters
     clusters = malloc(sizeof(struct cluster) * K);
 
     for(int i = 0; i < K ; i++){
@@ -42,7 +42,8 @@ void init(){
     }
 
 }
-//Adiciona pontos ao cluster correto
+
+//Adds points to cluster
 void assign_points(){
     for(int i = 0; i < N; i++){
         float min_dist = euclidean_distance(pontos[i], clusters[0].centroid); //Calcula distancia euclediana do Ponto ao primeiro cluster
@@ -55,7 +56,6 @@ void assign_points(){
                 cluster = j;
             }
         }
-
 
         if(pontos[i].cluster == cluster){
             clusters[cluster].soma_x += pontos[i].x;
@@ -71,6 +71,7 @@ void assign_points(){
     }
 }
 
+//Calculates centroids
 void calculate_centroids(){
     for(int i = 0; i < K; i++){
         clusters[i].centroid.x = clusters[i].soma_x/clusters[i].nr_pontos;
@@ -78,9 +79,7 @@ void calculate_centroids(){
     }
 }
 
-
-
-
+//Checks for convergence
 int centroids_changed(Tuple * old_centroids){
     int counter = 0;
     for(int i = 0; i < K; i++){
@@ -94,7 +93,7 @@ int centroids_changed(Tuple * old_centroids){
 }
 
 
-
+// K-Means Algorithm
 void k_means(){
     iterations = 0; //Porque a primeira iteração faz parte da inicialização
     Tuple * old_centroids = malloc(sizeof(struct tuple) * K);
@@ -124,9 +123,14 @@ void k_means(){
     free(clusters);
 }
 
-int main(){
+int main(int argc, char * argv[]){
+    N = atoi(argv[1]);
+    K = atoi(argv[2]);
+    float initial_time = clock();
     init();
     k_means();
+    float final_time = clock();
+    printf("Tempo: %f\n", (final_time - initial_time)/pow(10,6));
     return 0;
 }
 

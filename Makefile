@@ -5,7 +5,7 @@ INCLUDES = include/
 EXEC = k_meansv2
 EXEC_PAR = k_meansv2_par
 THREADS = 4
-CP_CLUSTERS = 4
+CP_CLUSTERS = 32
 
 CFLAGS = -lm -Wall -O2 -g
 CFLAGS_PAR = -O2 -fopenmp -lm

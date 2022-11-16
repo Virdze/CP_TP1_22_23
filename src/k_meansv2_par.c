@@ -45,14 +45,6 @@ void init(){
 
 }
 
-/*
-    VARIAVEIS COMUNS AS THREADS:
-        -> clusters[cluster].soma_x * 4
-        -> clusters[cluster].soma_y * 4
-        -> clusters[clusters].nr_pontos; * 4
-*/
-
-
 //Adiciona pontos ao cluster correto
 void assign_points(){
     
