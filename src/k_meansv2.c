@@ -103,7 +103,7 @@ void k_means(){
                             // Repetição desta filosofia dentro do ciclo mas com a verificação do caso de paragem
                             // Goal : 39 ITERATIONS
     int flag = 0;
-    while(!flag){
+    while(!flag && iterations < 20){
         for(int i = 0; i < K ; i++){
         old_centroids[i] = clusters[i].centroid;
         clusters[i].soma_x = 0;

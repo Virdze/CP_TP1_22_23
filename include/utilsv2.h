@@ -17,7 +17,7 @@ typedef struct cluster{
 
 
 inline float euclidean_distance(Tuple p1, Tuple p2){
-    return sqrt((p2.y - p1.y)*(p2.y - p1.y) + (p2.x - p1.x) * (p2.x - p1.x));
+    return (p2.y - p1.y)*(p2.y - p1.y) + (p2.x - p1.x) * (p2.x - p1.x);
 }
 
 #endif

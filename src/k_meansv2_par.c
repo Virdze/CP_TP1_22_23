@@ -61,10 +61,10 @@ void assign_points(){
         sums_y[k] = 0;
         counts[k] = 0;
     }
-    int i; 
-    #pragma omp parallel for num_threads(2) \
+ 
+    #pragma omp parallel for num_threads(T) \
         reduction(+ : sums_x[:K], sums_y[:K], counts[:K]) 
-    for(i = 0; i < N; i++){
+    for(int i = 0; i < N; i++){
         float min_dist = euclidean_distance(pontos[i], clusters[0].centroid); //Calcula distancia euclediana do Ponto ao primeiro cluster
         int cluster = 0;
         for(int j = 1; j < K; j++){
