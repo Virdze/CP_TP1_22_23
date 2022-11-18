@@ -34,7 +34,7 @@ void init(){
 
     //Inicialização dos clusters
     clusters = malloc(sizeof(struct cluster) * K);
-
+    
     for(int i = 0; i < K ; i++){
         clusters[i].centroid.x = pontos[i].x;
         clusters[i].centroid.y = pontos[i].y;
@@ -57,7 +57,7 @@ void assign_points(){
     }
  
     #pragma omp parallel for num_threads(T) \
-        reduction(+ : sums_x[:K], sums_y[:K], counts[:K]) 
+        reduction(+ : sums_x[:K], sums_y[:K], counts[:K])
     for(int i = 0; i < N; i++){
         float min_dist = euclidean_distance(pontos[i], clusters[0].centroid); //Calcula distancia euclediana do Ponto ao primeiro cluster
         int cluster = 0;
@@ -81,6 +81,7 @@ void assign_points(){
         }
 
     }
+
     for(int tmp = 0; tmp < K ; tmp++){
         clusters[tmp].soma_x = sums_x[tmp];
         clusters[tmp].soma_y = sums_y[tmp];
@@ -144,8 +145,11 @@ int main(int argc, char * argv[]){
     N = atoi(argv[1]);
     K = atoi(argv[2]);
     T = atoi(argv[3]);
+    clock_t initial_time = clock();
     init();
     k_means();
+    clock_t final_time = clock();
+    printf("Tempo: %f\n", (final_time - initial_time)/pow(10,6));
     return 0;
 }
 

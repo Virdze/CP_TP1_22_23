@@ -4,13 +4,13 @@ SRC = src/
 INCLUDES = include/
 EXEC = k_meansv2
 EXEC_PAR = k_meansv2_par
-THREADS = 4
-CP_CLUSTERS = 32
+THREADS = 16
+CP_CLUSTERS = 4
 
 CFLAGS = -lm -Wall -O2 -g
 CFLAGS_PAR = -O2 -fopenmp -lm
 
-.DEFAULT_GOAL = k_meansv2
+.DEFAULT_GOAL = k_meansv2_par
 
 k_meansv2: $(BIN)utilsv2.o $(BIN)k_meansv2.o 
 	$(CC) $(BIN)k_meansv2.o $(BIN)utilsv2.o -o $(BIN)$(EXEC) $(CFLAGS)
